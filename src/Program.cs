@@ -7,11 +7,11 @@ internal static class Program
 {
   internal static void Main()
   {
-    PracticeTask userSelect = PracticeTask.Ex1;
+    PracticeTask userSelect = PracticeTask.UsingAbstractClassesAndMethodOverridesForPolymorphism;
 
     switch (userSelect)
     {
-      case PracticeTask.Ex1:
+      case PracticeTask.UsingAbstractClassesAndMethodOverridesForPolymorphism:
         //träna på nåt här
         /* Intro: abstrakt basklass + override
 Skapa den abstrakta basklassen Animal med en abstrakt metod MakeSound().
