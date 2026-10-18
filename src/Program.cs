@@ -8,7 +8,7 @@ internal static class Program
 {
   internal static void Main()
   {
-    PracticeTask userSelect = PracticeTask.Ex3;
+    PracticeTask userSelect = PracticeTask.SolidExercises;
 
     switch (userSelect)
     {
@@ -78,8 +78,11 @@ Lägg till LightSensor i listan av sensorer i Main-metoden och kör programmet. 
           DataLayer.SaveToFile("SensorInfo", message);
         }
         break;
-      case PracticeTask.Ex3:
+      case PracticeTask.SolidExercises:
+        // Övning 1 – SRP: Order ansvarar för beräkningar och ReceiptPrinter för presentation.
         var items = new List<OrderItem> { new("Bok", 2, 120m), new("Penna", 5, 10m) };
+
+        // Övning 2 – OCP: Nya rabattregler ska kunna läggas till utan att Order ändras.
         DiscountPolicy discountPolicy = new ThresholdDiscount(300, 0.1m);
         var order = new Order(discountPolicy);
         order.Add(items);
@@ -135,6 +138,7 @@ class Order(DiscountPolicy discountPolicy)
   }
 }
 
+// OCP: Nya rabattregler kan läggas till som nya subklasser utan att Order ändras.
 internal abstract class DiscountPolicy()
 {
   public abstract decimal CalculateDiscount(decimal sum);

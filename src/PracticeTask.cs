@@ -4,5 +4,5 @@ public enum PracticeTask
 {
   UsingAbstractClassesAndMethodOverridesForPolymorphism,
   Ex2,
-  Ex3,
+  SolidExercises,
 }
