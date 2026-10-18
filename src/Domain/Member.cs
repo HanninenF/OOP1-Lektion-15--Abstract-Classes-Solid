@@ -1,4 +1,4 @@
-namespace P01;
+namespace P01.src.Domain;
 
 public enum Member
 {

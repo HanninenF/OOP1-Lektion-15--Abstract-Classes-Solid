@@ -80,9 +80,10 @@ Lägg till LightSensor i listan av sensorer i Main-metoden och kör programmet. 
         break;
       case PracticeTask.Ex3:
         var items = new List<OrderItem> { new("Bok", 2, 120m), new("Penna", 5, 10m) };
-
-        var order = new Order();
+        DiscountPolicy discountPolicy = new ThresholdDiscount(300, 0.1m);
+        var order = new Order(discountPolicy);
         order.Add(items);
+
         ReceiptPrinter.PrintReceipt(order); // Skriver ut totalsumma + rader
         break;
 
@@ -102,7 +103,7 @@ class OrderItem
     (Name, Quantity, UnitPrice) = (name, qty, price);
 }
 
-class Order
+class Order(DiscountPolicy discountPolicy)
 {
   private readonly List<OrderItem> _items = new();
 
@@ -129,13 +130,27 @@ class Order
 
   public decimal CalculateTotal(decimal rate = 0.25m)
   {
-    return CalculateSubtotal() + CalculateVat(rate);
+    decimal discount = discountPolicy.CalculateDiscount(CalculateSubtotal() + CalculateVat(rate));
+    return CalculateSubtotal() + CalculateVat(rate) - discount;
   }
 }
 
-internal abstract class DiscountPolicy
+internal abstract class DiscountPolicy()
 {
-  public decimal Discount { get; private set; } = 0;
+  public abstract decimal CalculateDiscount(decimal sum);
+}
+
+internal class ThresholdDiscount(decimal threshold, decimal discount) : DiscountPolicy
+{
+  public override decimal CalculateDiscount(decimal sum)
+  {
+    if (sum > threshold)
+    {
+      return sum * discount;
+    }
+    else
+      return 0;
+  }
 }
 
 /* internal class ItemCountDiscount : DiscountPolicy
@@ -152,7 +167,9 @@ internal static class ReceiptPrinter
   {
     Console.WriteLine("KVITTO");
     foreach (var i in order.GetOrderItems())
+    {
       Console.WriteLine($"{i.Name} x{i.Quantity} á {i.UnitPrice:C} = {i.UnitPrice * i.Quantity:C}");
+    }
     Console.WriteLine($"Delsumma: {order.CalculateSubtotal():C}");
     Console.WriteLine($"Moms (25%): {order.CalculateVat():C}");
     Console.WriteLine($"Totalt: {order.CalculateTotal():C}");
