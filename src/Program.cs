@@ -1,4 +1,5 @@
 ﻿using P01.src.Domain;
+using P01.src.Infrastructure;
 using P01.src.Presentation;
 
 namespace P01.src;
@@ -7,7 +8,7 @@ internal static class Program
 {
   internal static void Main()
   {
-    PracticeTask userSelect = PracticeTask.Ex2;
+    PracticeTask userSelect = PracticeTask.Ex3;
 
     switch (userSelect)
     {
@@ -77,14 +78,12 @@ Lägg till LightSensor i listan av sensorer i Main-metoden och kör programmet. 
           DataLayer.SaveToFile("SensorInfo", message);
         }
         break;
-    }
-  }
-}
+      case PracticeTask.Ex3:
 
-internal static class DataLayer //ska det här in i infra?
-{
-  internal static void SaveToFile(string filePath, string content)
-  {
-    File.AppendAllText($"{filePath}.txt", content);
+        break;
+
+      default:
+        break;
+    }
   }
 }
