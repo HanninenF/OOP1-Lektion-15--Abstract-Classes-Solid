@@ -72,9 +72,19 @@ Lägg till LightSensor i listan av sensorer i Main-metoden och kör programmet. 
 
         foreach (Sensor sensor in sensors)
         {
-          Present.PrintToConsole($"{sensor.ReadValue()}{sensor.Unit}");
+          string message = $"{sensor.ReadValue()}{sensor.Unit}\n";
+          Present.PrintToConsole(message);
+          DataLayer.SaveToFile("SensorInfo", message);
         }
         break;
     }
+  }
+}
+
+internal static class DataLayer //ska det här in i infra?
+{
+  internal static void SaveToFile(string filePath, string content)
+  {
+    File.AppendAllText($"{filePath}.txt", content);
   }
 }
