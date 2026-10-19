@@ -91,8 +91,14 @@ Lägg till LightSensor i listan av sensorer i Main-metoden och kör programmet. 
         var order = new Order(discountPolicy);
         order.Add(items);
 
+        DiscountPolicy paltkomaDiscount = new PaltkomaDiscount();
+        Order orderPaltkomaDiscount = new(paltkomaDiscount);
+        orderPaltkomaDiscount.Add(items);
+
         /* ReceiptPrinter.PrintReceipt(order); // Skriver ut totalsumma + rader */
-        ReceiptPrinter.PrintReceipt(orderWithItemCountDiscount);
+        /* ReceiptPrinter.PrintReceipt(orderWithItemCountDiscount); */
+        ReceiptPrinter.PrintReceipt(orderPaltkomaDiscount);
+
         break;
 
       default:
@@ -176,12 +182,28 @@ internal class ThresholdDiscount(decimal threshold, decimal discount) : Discount
   }
 }
 
-internal class ItemCountDiscount() : DiscountPolicy
+internal class ItemCountDiscount : DiscountPolicy
 {
   public override decimal CalculateDiscount(DiscountContext discountContext)
   {
     decimal discount = 0.1m;
     if (discountContext.ItemCount > 10)
+    {
+      return discountContext.Sum * discount;
+    }
+    else
+      return 0;
+  }
+}
+
+internal class PaltkomaDiscount : DiscountPolicy
+{
+  public override decimal CalculateDiscount(DiscountContext discountContext)
+  {
+    DateTimeOffset now = DateTimeOffset.Now;
+
+    decimal discount = 0.1m;
+    if (now.Hour > 12 && now.Hour < 21)
     {
       return discountContext.Sum * discount;
     }
