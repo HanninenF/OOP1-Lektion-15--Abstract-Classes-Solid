@@ -95,8 +95,8 @@ Lägg till LightSensor i listan av sensorer i Main-metoden och kör programmet. 
         Order orderPaltkomaDiscount = new(paltkomaDiscount);
         orderPaltkomaDiscount.Add(items);
 
-        /* ReceiptPrinter.PrintReceipt(order); // Skriver ut totalsumma + rader */
-        /* ReceiptPrinter.PrintReceipt(orderWithItemCountDiscount); */
+        ReceiptPrinter.PrintReceipt(order); // Skriver ut totalsumma + rader
+        ReceiptPrinter.PrintReceipt(orderWithItemCountDiscount);
         ReceiptPrinter.PrintReceipt(orderPaltkomaDiscount);
 
         break;
