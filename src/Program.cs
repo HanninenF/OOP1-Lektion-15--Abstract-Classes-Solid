@@ -84,10 +84,15 @@ Lägg till LightSensor i listan av sensorer i Main-metoden och kör programmet. 
 
         // Övning 2 – OCP: Nya rabattregler ska kunna läggas till utan att Order ändras.
         DiscountPolicy discountPolicy = new ThresholdDiscount(300, 0.1m);
+        DiscountPolicy itemCountDiscount = new ItemCountDiscount();
+        var orderWithItemCountDiscount = new Order(itemCountDiscount);
+        orderWithItemCountDiscount.Add(items);
+
         var order = new Order(discountPolicy);
         order.Add(items);
 
-        ReceiptPrinter.PrintReceipt(order); // Skriver ut totalsumma + rader
+        /* ReceiptPrinter.PrintReceipt(order); // Skriver ut totalsumma + rader */
+        ReceiptPrinter.PrintReceipt(orderWithItemCountDiscount);
         break;
 
       default:
@@ -115,6 +120,16 @@ class Order(DiscountPolicy discountPolicy)
     return _items;
   }
 
+  public int GetTotalItems()
+  {
+    int totalItems = 0;
+    for (int i = 0; i < _items.Count; i++)
+    {
+      totalItems += _items[i].Quantity;
+    }
+    return totalItems;
+  }
+
   public void Add(IEnumerable<OrderItem> items) => _items.AddRange(items);
 
   // ANSVAR 1: beräkningar
@@ -133,7 +148,11 @@ class Order(DiscountPolicy discountPolicy)
 
   public decimal CalculateTotal(decimal rate = 0.25m)
   {
-    decimal discount = discountPolicy.CalculateDiscount(CalculateSubtotal() + CalculateVat(rate));
+    DiscountContext discountContext = new(
+      CalculateSubtotal() + CalculateVat(rate),
+      GetTotalItems()
+    );
+    decimal discount = discountPolicy.CalculateDiscount(discountContext);
     return CalculateSubtotal() + CalculateVat(rate) - discount;
   }
 }
@@ -141,29 +160,41 @@ class Order(DiscountPolicy discountPolicy)
 // OCP: Nya rabattregler kan läggas till som nya subklasser utan att Order ändras.
 internal abstract class DiscountPolicy()
 {
-  public abstract decimal CalculateDiscount(decimal sum);
+  public abstract decimal CalculateDiscount(DiscountContext discountContext);
 }
 
 internal class ThresholdDiscount(decimal threshold, decimal discount) : DiscountPolicy
 {
-  public override decimal CalculateDiscount(decimal sum)
+  public override decimal CalculateDiscount(DiscountContext discountContext)
   {
-    if (sum > threshold)
+    if (discountContext.Sum > threshold)
     {
-      return sum * discount;
+      return discountContext.Sum * discount;
     }
     else
       return 0;
   }
 }
 
-/* internal class ItemCountDiscount : DiscountPolicy
+internal class ItemCountDiscount() : DiscountPolicy
 {
-  public decimal GetDiscountIfMoreThanTenItems()
+  public override decimal CalculateDiscount(DiscountContext discountContext)
   {
-    
+    decimal discount = 0.1m;
+    if (discountContext.ItemCount > 10)
+    {
+      return discountContext.Sum * discount;
+    }
+    else
+      return 0;
   }
-} */
+}
+
+internal class DiscountContext(decimal sum, int itemCount)
+{
+  public decimal Sum { get; private set; } = sum;
+  public int ItemCount { get; private set; } = itemCount;
+}
 
 internal static class ReceiptPrinter
 {
